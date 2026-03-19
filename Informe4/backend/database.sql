@@ -4,7 +4,7 @@ CREATE TABLE Usuario (
     nombre VARCHAR(25),
     apellido VARCHAR(25),
     correo VARCHAR(50),
-    contraseña VARCHAR(20),
+    contrasena VARCHAR(20),
     PRIMARY KEY (id_usuario)
 );
 
@@ -80,3 +80,5 @@ REFERENCES Usuario(id_usuario);
 ALTER TABLE curso_aprobado
 ADD FOREIGN KEY (id_curso)
 REFERENCES Curso(id_curso);
+
+SHOW TABLES;
