@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const Login = () => {
+const Login = ({irARegistro}) => {
   const [correo, setCorreo] = useState('');
   const [contrasena, setContrasena] = useState('');
   const [mensaje, setMensaje] = useState('');
@@ -71,7 +71,8 @@ const Login = () => {
       {mensaje && <p style={styles.mensaje}>{mensaje}</p>}
       
       <div style={styles.links}>
-        <a href="/registro">Registrarse</a> | <a href="/recuperar">Recuperar contraseña</a>
+        <span onClick={irARegistro} style={{color: 'blue', cursor: 'pointer', textDecoration: 'underline'}}>Registrarse</span>
+         | <a href="/recuperar">Recuperar contraseña</a>
       </div>
     </div>
   );
