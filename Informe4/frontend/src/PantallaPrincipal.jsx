@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import SeccionComentarios from './SeccionComentarios';
 
 const PantallaPrincipal = ({ cerrarSesion }) => {
   const [publicaciones, setPublicaciones] = useState([]);
@@ -9,6 +10,7 @@ const PantallaPrincipal = ({ cerrarSesion }) => {
   const [nuevoTipo, setNuevoTipo] = useState('curso');
   const [nuevaReferenciaId, setNuevaReferenciaId] = useState('');
   const [nuevoMensaje, setNuevoMensaje] = useState('');
+  const [publicacionAbierta, setPublicacionAbierta] = useState(null);
 
   const obtenerPublicaciones = async () => {
     try {
@@ -126,20 +128,33 @@ const PantallaPrincipal = ({ cerrarSesion }) => {
         </form>
       )}
 
-      <div style={styles.listaPublicaciones}>
+        <div style={styles.listaPublicaciones}>
         {publicaciones.map((pub) => (
-          <div key={pub.id_publicacion} style={styles.card}>
+            <div key={pub.id_publicacion} style={styles.card}>
             <div style={styles.cardHeader}>
-              <strong>{pub.nombre_usuario}</strong> publicó sobre el {pub.tipo}: <em>{pub.referencia}</em>
+                <strong>{pub.nombre_usuario}</strong> publicó sobre el {pub.tipo}: <em>{pub.referencia}</em>
             </div>
+            
             <p style={styles.cardMensaje}>{pub.mensaje}</p>
+            
             <div style={styles.cardFooter}>
-              <small>Fecha: {new Date(pub.fecha).toLocaleString()}</small>
-              <button style={styles.btnComentar}>Ver/Comentar</button>
+                <small>Fecha: {new Date(pub.fecha).toLocaleString()}</small>
+                <button 
+                style={styles.btnComentar} 
+                onClick={() => setPublicacionAbierta(publicacionAbierta === pub.id_publicacion ? null : pub.id_publicacion)}
+                >
+                {publicacionAbierta === pub.id_publicacion ? 'Ocultar' : 'Ver/Comentar'}
+                </button>
             </div>
-          </div>
+
+            {publicacionAbierta === pub.id_publicacion && (
+                <div style={{ marginTop: '15px', borderTop: '1px solid #eee', paddingTop: '10px' }}>
+                <SeccionComentarios idPublicacion={pub.id_publicacion} />
+                </div>
+            )}
+            </div>
         ))}
-      </div>
+        </div>
     </div>
   );
 };
