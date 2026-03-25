@@ -3,25 +3,68 @@ import React, { useState, useEffect } from 'react';
 const PantallaPrincipal = ({ cerrarSesion }) => {
   const [publicaciones, setPublicaciones] = useState([]);
   const [busqueda, setBusqueda] = useState('');
-  const [tipoFiltro, setTipoFiltro] = useState('curso');
+  const [tipoFiltro, setTipoFiltro] = useState('curso'); 
+  
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [nuevoTipo, setNuevoTipo] = useState('curso');
+  const [nuevaReferenciaId, setNuevaReferenciaId] = useState('');
+  const [nuevoMensaje, setNuevoMensaje] = useState('');
+
+  const obtenerPublicaciones = async () => {
+    try {
+      const respuesta = await fetch('http://localhost:3001/api/publicaciones');
+      if (respuesta.ok) {
+        const data = await respuesta.json();
+        setPublicaciones(data);
+      }
+    } catch (error) {
+      console.error('Error de conexión:', error);
+    }
+  };
 
   useEffect(() => {
-    const obtenerPublicaciones = async () => {
-      try {
-        const respuesta = await fetch('http://localhost:3001/api/publicaciones');
-        if (respuesta.ok) {
-          const data = await respuesta.json();
-          setPublicaciones(data);
-        } else {
-          console.error('Error al cargar publicaciones');
-        }
-      } catch (error) {
-        console.error('Error de conexión:', error);
-      }
-    };
-
     obtenerPublicaciones();
   }, []);
+
+  const handleCrearPublicacion = async (e) => {
+    e.preventDefault(); 
+    const usuarioString = localStorage.getItem('usuarioActivo');
+    if (!usuarioString) {
+      alert("Error: No se encontró el usuario activo.");
+      return;
+    }
+    const usuario = JSON.parse(usuarioString);
+
+    try {
+      console.log("Enviando datos al servidor..."); 
+      
+      const respuesta = await fetch('http://localhost:3001/api/publicaciones', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id_usuario: usuario.id_usuario,
+          tipo: nuevoTipo,
+          referencia_id: nuevaReferenciaId,
+          mensaje: nuevoMensaje
+        }),
+      });
+
+      console.log("Respuesta del servidor:", respuesta.status);
+
+      if (respuesta.ok) {
+        alert("Publicación guardada exitosamente!");
+        setMostrarFormulario(false);
+        setNuevaReferenciaId('');
+        setNuevoMensaje('');
+        obtenerPublicaciones(); 
+      } else {
+        alert("Error en la base de datos");
+      }
+    } catch (error) {
+      alert("Error de red");
+      console.error('Error atrapado:', error);
+    }
+  };
 
   return (
     <div style={styles.container}>
@@ -37,7 +80,7 @@ const PantallaPrincipal = ({ cerrarSesion }) => {
         </select>
         <input 
           type="text" 
-          placeholder={`Buscar ${tipoFiltro}...`} 
+          placeholder={`Buscar...`} 
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
           style={styles.inputBusqueda}
@@ -46,8 +89,42 @@ const PantallaPrincipal = ({ cerrarSesion }) => {
       </div>
 
       <div style={styles.btnCrearContenedor}>
-        <button style={styles.btnCrear}>+ Crear Nueva Publicación</button>
+        <button onClick={() => setMostrarFormulario(!mostrarFormulario)} style={styles.btnCrear}>
+          {mostrarFormulario ? 'Cancelar' : '+ Crear Nueva Publicación'}
+        </button>
       </div>
+
+      {mostrarFormulario && (
+        <form onSubmit={handleCrearPublicacion} style={styles.formularioBox}>
+          <h3>Nueva Publicación</h3>
+          <label>¿Sobre qué quieres opinar?</label>
+          <select value={nuevoTipo} onChange={(e) => setNuevoTipo(e.target.value)} style={styles.inputForm}>
+            <option value="curso">Curso</option>
+            <option value="catedratico">Catedrático</option>
+          </select>
+
+          <label>ID del {nuevoTipo === 'curso' ? 'Curso (ej. C001)' : 'Catedrático (ej. CAT01)'}:</label>
+          <input 
+            type="text" 
+            maxLength="10"
+            required 
+            value={nuevaReferenciaId} 
+            onChange={(e) => setNuevaReferenciaId(e.target.value)} 
+            style={styles.inputForm}
+          />
+
+          <label>Mensaje (máx. 50 caracteres):</label>
+          <textarea 
+            maxLength="50" 
+            required 
+            value={nuevoMensaje} 
+            onChange={(e) => setNuevoMensaje(e.target.value)} 
+            style={{...styles.inputForm, resize: 'none', height: '60px'}}
+          />
+
+          <button type="submit" style={styles.btnGuardar}>Guardar Publicación</button>
+        </form>
+      )}
 
       <div style={styles.listaPublicaciones}>
         {publicaciones.map((pub) => (
@@ -57,7 +134,7 @@ const PantallaPrincipal = ({ cerrarSesion }) => {
             </div>
             <p style={styles.cardMensaje}>{pub.mensaje}</p>
             <div style={styles.cardFooter}>
-              <small>Fecha: {pub.fecha}</small>
+              <small>Fecha: {new Date(pub.fecha).toLocaleString()}</small>
               <button style={styles.btnComentar}>Ver/Comentar</button>
             </div>
           </div>
@@ -67,7 +144,7 @@ const PantallaPrincipal = ({ cerrarSesion }) => {
   );
 };
 
-//diseño provisional
+//nuevo diseño
 const styles = {
   container: { maxWidth: '800px', margin: '20px auto', fontFamily: 'sans-serif' },
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#002855', color: 'white', padding: '10px 20px', borderRadius: '8px' },
@@ -78,6 +155,9 @@ const styles = {
   btnBuscar: { padding: '8px 15px', backgroundColor: '#5bc0de', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' },
   btnCrearContenedor: { marginTop: '15px', textAlign: 'right' },
   btnCrear: { padding: '10px 20px', backgroundColor: '#5cb85c', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' },
+  formularioBox: { marginTop: '15px', padding: '15px', border: '2px dashed #5cb85c', borderRadius: '8px', backgroundColor: '#f9fff9', display: 'flex', flexDirection: 'column', gap: '10px', textAlign: 'left' },
+  inputForm: { padding: '8px', borderRadius: '4px', border: '1px solid #ccc', width: '100%', boxSizing: 'border-box' },
+  btnGuardar: { padding: '10px', backgroundColor: '#002855', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' },
   listaPublicaciones: { marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '15px' },
   card: { border: '1px solid #ddd', borderRadius: '8px', padding: '15px', backgroundColor: 'white', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' },
   cardHeader: { borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '10px' },
