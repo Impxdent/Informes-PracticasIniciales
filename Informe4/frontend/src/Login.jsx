@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const Login = ({irARegistro, irAPrincipal}) => {
+const Login = ({irARegistro, irAPrincipal, irARecuperar}) => {
   const [correo, setCorreo] = useState('');
   const [contrasena, setContrasena] = useState('');
   const [mensaje, setMensaje] = useState('');
@@ -20,7 +20,7 @@ const Login = ({irARegistro, irAPrincipal}) => {
       const data = await respuesta.json();
 
       if (respuesta.ok) {
-        setMensaje('✅ ' + data.mensaje);
+        setMensaje('Exito ' + data.mensaje);
         localStorage.setItem('usuarioActivo', JSON.stringify(data.usuario));
         
         irAPrincipal();
@@ -72,7 +72,7 @@ const Login = ({irARegistro, irAPrincipal}) => {
       
       <div style={styles.links}>
         <span onClick={irARegistro} style={{color: 'blue', cursor: 'pointer', textDecoration: 'underline'}}>Registrarse</span>
-         | <a href="/recuperar">Recuperar contraseña</a>
+         | <span onClick={irARecuperar} style={{color: 'blue', cursor: 'pointer', textDecoration: 'underline'}}>Recuperar contraseña</span>
       </div>
     </div>
   );
