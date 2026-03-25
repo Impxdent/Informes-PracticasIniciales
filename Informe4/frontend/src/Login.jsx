@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const Login = ({irARegistro}) => {
+const Login = ({irARegistro, irAPrincipal}) => {
   const [correo, setCorreo] = useState('');
   const [contrasena, setContrasena] = useState('');
   const [mensaje, setMensaje] = useState('');
@@ -23,7 +23,7 @@ const Login = ({irARegistro}) => {
         setMensaje('✅ ' + data.mensaje);
         localStorage.setItem('usuarioActivo', JSON.stringify(data.usuario));
         
-        // agregar pantalla 
+        irAPrincipal();
         
       } else {
         setMensaje('Credenciales incorrectas' + data.mensaje);
