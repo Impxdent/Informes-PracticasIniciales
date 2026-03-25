@@ -36,7 +36,7 @@ const Login = ({irARegistro, irAPrincipal, irARecuperar}) => {
 
   return (
     <div style={styles.container}>
-      <h2>Inicio de Sesión - Ingeniería</h2>
+      <h2>Inicio de Sesión - Facultad de Ingeniería</h2>
       
       <form onSubmit={handleSubmit} style={styles.form}>
         <div style={styles.inputGroup}>
