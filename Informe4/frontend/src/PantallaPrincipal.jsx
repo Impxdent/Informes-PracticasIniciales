@@ -6,11 +6,21 @@ const PantallaPrincipal = ({ cerrarSesion }) => {
   const [tipoFiltro, setTipoFiltro] = useState('curso');
 
   useEffect(() => {
-    const datosSimulados = [
-      { id_publicacion: '1', nombre_usuario: 'Juan Perez', tipo: 'Curso', referencia: 'Matemática Básica 1', mensaje: 'El curso requiere mucha práctica, pero es pasable.', fecha: '2026-03-24 10:30:00' },
-      { id_publicacion: '2', nombre_usuario: 'Maria Lopez', tipo: 'Catedrático', referencia: 'Inga. Floriza Avila', mensaje: 'Excelente ingeniera, explica muy bien los frameworks.', fecha: '2026-03-23 15:45:00' }
-    ];
-    setPublicaciones(datosSimulados);
+    const obtenerPublicaciones = async () => {
+      try {
+        const respuesta = await fetch('http://localhost:3001/api/publicaciones');
+        if (respuesta.ok) {
+          const data = await respuesta.json();
+          setPublicaciones(data);
+        } else {
+          console.error('Error al cargar publicaciones');
+        }
+      } catch (error) {
+        console.error('Error de conexión:', error);
+      }
+    };
+
+    obtenerPublicaciones();
   }, []);
 
   return (
