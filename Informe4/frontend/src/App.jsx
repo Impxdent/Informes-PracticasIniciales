@@ -3,6 +3,7 @@ import Login from './Login';
 import PantallaPrincipal from './PantallaPrincipal';
 import RecuperarPassword from './RecuperarPassword';
 import CursosAprobados from './CursosAprobados';
+import PerfilUsuario from './PerfilUsuario';
 
 const App = () => {
   const [pantallaActual, setPantallaActual] = useState('login');
@@ -12,6 +13,7 @@ const App = () => {
   const irARecuperar = () => setPantallaActual('recuperar');
   const irARegistro = () => setPantallaActual('registro');
   const irACursos = () => setPantallaActual('cursos');
+  const irAPerfil = () => setPantallaActual('perfil');
 
   return (
     <div>
@@ -19,6 +21,7 @@ const App = () => {
         <nav style={styles.nav}>
           <button onClick={irAPrincipal} style={pantallaActual === 'principal' ? styles.btnActive : styles.btnNav}>Foro / Publicaciones</button>
           <button onClick={irACursos} style={pantallaActual === 'cursos' ? styles.btnActive : styles.btnNav}>Mis Cursos Aprobados</button>
+          <button onClick={irAPerfil} style={pantallaActual === 'perfil' ? styles.btnActive : styles.btnNav}>Mi Perfil</button>
         </nav>
       )}
 
@@ -32,6 +35,10 @@ const App = () => {
 
       {pantallaActual === 'principal' && (
         <PantallaPrincipal cerrarSesion={irALogin} />
+      )}
+
+      {pantallaActual === 'perfil' && (
+        <PerfilUsuario irAForo={irAPrincipal} />
       )}
 
       {pantallaActual === 'cursos' && (
