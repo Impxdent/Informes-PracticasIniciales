@@ -4,58 +4,80 @@ import PantallaPrincipal from './PantallaPrincipal';
 import RecuperarPassword from './RecuperarPassword';
 import CursosAprobados from './CursosAprobados';
 import PerfilUsuario from './PerfilUsuario';
+import Registro from './Registro';
 
 const App = () => {
   const [pantallaActual, setPantallaActual] = useState('login');
 
+  // Funciones de navegación
   const irAPrincipal = () => setPantallaActual('principal');
-  const irALogin = () => setPantallaActual('login');
+  const irALogin = () => {
+    localStorage.removeItem('usuarioActivo'); // Limpia sesión al salir
+    setPantallaActual('login');
+  };
   const irARecuperar = () => setPantallaActual('recuperar');
   const irARegistro = () => setPantallaActual('registro');
   const irACursos = () => setPantallaActual('cursos');
   const irAPerfil = () => setPantallaActual('perfil');
 
+  const mostrarNav = ['principal', 'cursos', 'perfil'].includes(pantallaActual);
+
   return (
-    <div>
-      {(pantallaActual === 'principal' || pantallaActual === 'cursos') && (
+    <div style={{ backgroundColor: '#f4f7f6', minHeight: '100vh' }}>
+      {mostrarNav && (
         <nav style={styles.nav}>
-          <button onClick={irAPrincipal} style={pantallaActual === 'principal' ? styles.btnActive : styles.btnNav}>Foro / Publicaciones</button>
-          <button onClick={irACursos} style={pantallaActual === 'cursos' ? styles.btnActive : styles.btnNav}>Mis Cursos Aprobados</button>
-          <button onClick={irAPerfil} style={pantallaActual === 'perfil' ? styles.btnActive : styles.btnNav}>Mi Perfil</button>
+          <button 
+            onClick={irAPrincipal} 
+            style={pantallaActual === 'principal' ? styles.btnActive : styles.btnNav}
+          >
+            Foro / Publicaciones
+          </button>
+          <button 
+            onClick={irACursos} 
+            style={pantallaActual === 'cursos' ? styles.btnActive : styles.btnNav}
+          >
+            Mis Cursos Aprobados
+          </button>
+          <button 
+            onClick={irAPerfil} 
+            style={pantallaActual === 'perfil' ? styles.btnActive : styles.btnNav}
+          >
+            Mi Perfil
+          </button>
+          <button onClick={irALogin} style={styles.btnSalirNav}>
+            Salir
+          </button>
         </nav>
       )}
 
-      {pantallaActual === 'login' && (
-        <Login irAPrincipal={irAPrincipal} irARecuperar={irARecuperar} irARegistro={irARegistro} />
-      )}
-      
-      {pantallaActual === 'recuperar' && (
-        <RecuperarPassword irALogin={irALogin} />
-      )}
+      <main style={styles.mainContent}>
+        
+        {pantallaActual === 'login' && (
+          <Login irAPrincipal={irAPrincipal} irARecuperar={irARecuperar} irARegistro={irARegistro} />
+        )}
+        
+        {pantallaActual === 'registro' && (
+          <Registro irALogin={irALogin} /> 
+        )}
 
-      {pantallaActual === 'principal' && (
-        <PantallaPrincipal cerrarSesion={irALogin} />
-      )}
+        {pantallaActual === 'recuperar' && (
+          <RecuperarPassword irALogin={irALogin} />
+        )}
 
-      {pantallaActual === 'perfil' && (
-        <PerfilUsuario irAForo={irAPrincipal} />
-      )}
+        {pantallaActual === 'principal' && (
+          <PantallaPrincipal cerrarSesion={irALogin} />
+        )}
 
-      {pantallaActual === 'cursos' && (
-        <div style={{ maxWidth: '800px', margin: '20px auto' }}>
-          <CursosAprobados />
-          <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            <button onClick={irALogin} style={{ color: 'red', cursor: 'pointer', border: 'none', background: 'none' }}>Cerrar Sesión</button>
+        {pantallaActual === 'perfil' && (
+          <PerfilUsuario irAForo={irAPrincipal} />
+        )}
+
+        {pantallaActual === 'cursos' && (
+          <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+            <CursosAprobados />
           </div>
-        </div>
-      )}
-
-      {pantallaActual === 'registro' && (
-        <div style={{ textAlign: 'center', marginTop: '50px' }}>
-          <h2>Pantalla de Registro (Próximamente)</h2>
-          <button onClick={irALogin}>Volver al Login</button>
-        </div>
-      )}
+        )}
+      </main>
     </div>
   );
 };
@@ -64,28 +86,47 @@ const styles = {
   nav: { 
     display: 'flex', 
     justifyContent: 'center', 
-    gap: '10px', 
-    padding: '15px', 
+    alignItems: 'center',
+    gap: '15px', 
+    padding: '15px 20px', 
     backgroundColor: '#002855', 
-    marginBottom: '20px' 
+    boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+    position: 'sticky',
+    top: 0,
+    zIndex: 1000
   },
   btnNav: { 
-    padding: '10px 20px', 
-    backgroundColor: 'white', 
+    padding: '10px 18px', 
+    backgroundColor: 'transparent', 
+    color: 'white', 
+    border: '1px solid rgba(255,255,255,0.3)', 
+    borderRadius: '6px', 
+    cursor: 'pointer',
+    fontWeight: '500',
+    transition: '0.3s'
+  },
+  btnActive: { 
+    padding: '10px 18px', 
+    backgroundColor: '#FFC107', 
     color: '#002855', 
-    border: 'none', 
-    borderRadius: '4px', 
+    border: '1px solid #FFC107', 
+    borderRadius: '6px', 
     cursor: 'pointer',
     fontWeight: 'bold'
   },
-  btnActive: { 
-    padding: '10px 20px', 
-    backgroundColor: '#FFC107', 
-    color: 'black', 
-    border: 'none', 
-    borderRadius: '4px', 
+  btnSalirNav: {
+    padding: '10px 18px',
+    backgroundColor: '#d9534f',
+    color: 'white',
+    border: 'none',
+    borderRadius: '6px',
     cursor: 'pointer',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    marginLeft: 'auto' 
+  },
+  mainContent: {
+    padding: '20px',
+    minHeight: 'calc(100vh - 80px)'
   }
 };
 
